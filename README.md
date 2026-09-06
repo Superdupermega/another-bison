@@ -16,6 +16,7 @@ Bison sells exactly those three things.
 | `docs/03-go-to-market.md` | ICP, channels, messaging, sales process, content engine |
 | `docs/04-operations.md` | Legal, tooling, hiring, QA, risk register |
 | `docs/05-spec-standard.md` | The Bison Intent Spec (BIS) — the open standard we deliver against |
+| `docs/06-what-we-missed-and-moats.md` | Strategic addendum: gaps in the plan, the five bets that create separation, the data flywheel, resequenced 90 days |
 | `site/` | The public website (static, zero build step, deploys anywhere) |
 | `site/tools/spec-builder.html` | Working lead-gen tool: generates a BIS intent spec in the browser |
 | `site/tools/readiness.html` | Working lead-gen tool: AI-native engineering readiness scorecard |
