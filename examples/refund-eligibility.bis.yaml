@@ -1,0 +1,51 @@
+bis: "0.1"
+id: BIS-2026-0042
+title: "Refund eligibility decision service"
+owner: "Head of Payments"
+decision_class: financial
+risk_tolerance: low
+status: draft
+
+outcome: >-
+  Customers with eligible orders receive a refund decision within 2 seconds, with
+  ≤0.1% incorrect approvals and zero incorrect denials over any rolling 30-day window.
+
+objectives:
+  - {priority: 1, objective: "Correct denials", metric: "false-deny rate", target: "0%", hard_floor: "0%"}
+  - {priority: 2, objective: "Correct approvals", metric: "false-approve rate", target: "0.1%", hard_floor: "0.5%"}
+  - {priority: 3, objective: "Latency", metric: "p95 decision time", target: "2s", hard_floor: "5s"}
+  - {priority: 4, objective: "Cost", metric: "model spend per decision", target: "$0.004", hard_floor: "$0.01"}
+
+constraints:
+  - {id: C1, rule: "Never expose a customer payment instrument to the model context", enforced_at: fence.policy.pii_egress, verified_by: PT-C1}
+  - {id: C2, rule: "Refunds above $500 always route to a human", enforced_at: topology.router.threshold, verified_by: PT-C2}
+  - {id: C3, rule: "Every decision is written to the audit stream before the customer is notified", enforced_at: integration.saga.step2, verified_by: PT-C3}
+
+edge_cases:
+  - {id: E1, condition: "Order older than 180 days", expected: "Deny with reason expired_window"}
+  - {id: E2, condition: "Partial refund already issued", expected: "Evaluate remaining balance only"}
+  - {id: E3, condition: "Model returns non-parseable output", expected: "One structured repair attempt, then route to human and log model_malformed"}
+  - {id: E4, condition: "Model unavailable > 3s", expected: "Queue decision, notify customer of delay, never auto-approve"}
+  - {id: E5, condition: "Two consensus agents disagree", expected: "Conservative option (deny-and-escalate) wins"}
+
+inputs:
+  order: {source: orders-db, freshness: "≤5s"}
+  policy: {source: policy-repo, freshness: on-deploy}
+  fraud_score: {source: fraud-service, freshness: "≤60s"}
+
+do_not_build:
+  - "Customer-facing appeals flow (separate spec)"
+  - "Fraud scoring; consume the existing fraud service"
+
+acceptance:
+  - {id: PT-C1, type: property, covers: C1, statement: "∀ request: model_context ∩ payment_instrument_fields = ∅"}
+  - {id: PT-C2, type: property, covers: C2, statement: "∀ refund > 500: route = human"}
+  - {id: PT-C3, type: property, covers: C3, statement: "∀ decision: audit_write_ts < notify_ts"}
+  - {id: AT-E3, type: scenario, covers: E3, statement: "Given malformed output, then one repair attempt then human route"}
+  - {id: AT-E4, type: scenario, covers: E4, statement: "Given 4s model timeout, decision is queued and no approval event emitted"}
+  - {id: MT-O1, type: metric, covers: O1, statement: "false-deny rate = 0 over rolling 30d"}
+
+regulatory_mapping:
+  - {regulation: "PSD2 Art. 73", covers: "C2, E4"}
+
+verification_evidence: []

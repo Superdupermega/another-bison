@@ -19,6 +19,8 @@ Bison sells exactly those three things.
 | `site/` | The public website (static, zero build step, deploys anywhere) |
 | `site/tools/spec-builder.html` | Working lead-gen tool: generates a BIS intent spec in the browser |
 | `site/tools/readiness.html` | Working lead-gen tool: AI-native engineering readiness scorecard |
+| `tools/bis-lint.py` | Command-line BIS validator (`python3 tools/bis-lint.py examples/*.bis.yaml`) |
+| `examples/` | Example BIS specs that pass the validator |
 
 ## Run the site locally
 
