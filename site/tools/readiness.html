@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Readiness Scorecard — Bison</title>
+<meta name="description" content="Score your organisation's readiness for AI-native engineering across intent, topology, verification and accountability.">
+<meta property="og:title" content="Readiness Scorecard — Bison">
+<meta property="og:description" content="Score your organisation's readiness for AI-native engineering across intent, topology, verification and accountability.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/site.js"></script>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="../index.html"><span class="mark"></span>BISON</a>
+  <nav><ul>
+    <li><a href="../services.html">Services</a></li>
+    <li><a href="../method.html">Method</a></li>
+    <li><a href="../pricing.html">Pricing</a></li>
+    <li><a href="../tools/spec-builder.html">Spec Builder</a></li>
+    <li><a href="../tools/readiness.html">Readiness</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="../contact.html">Book a call</a></li>
+  </ul></nav>
+</div></header>
+<main>
+<div class="wrap hero" style="padding-bottom:16px">
+  <div class="kicker">Free tool · 5 minutes</div>
+  <h1>AI-Native Engineering Readiness</h1>
+  <p class="lead">Twelve questions across the four disciplines. Your score and the top gaps are computed in your browser. Nothing is sent anywhere.</p>
+</div>
+<section style="padding-top:24px"><div class="wrap">
+<div class="grid c2" style="align-items:start">
+<form id="rf" class="card" onchange="score()" onsubmit="return false"></form>
+<div style="position:sticky;top:84px">
+  <div class="card">
+    <div class="tag">Overall</div>
+    <div class="score" id="total">–</div>
+    <div class="muted" id="band">Answer the questions to see your score.</div>
+    <div class="bar" style="margin-top:12px"><i id="barfill" style="width:0"></i></div>
+    <div id="dims" style="margin-top:20px"></div>
+  </div>
+  <div class="card" style="margin-top:16px"><div class="tag">Top gaps</div><ul id="gaps" class="muted" style="padding-left:18px"></ul>
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="button" onclick="copyReport()">Copy report</button><a class="btn primary" href="../contact.html">Discuss your gaps →</a></div></div>
+</div>
+</div>
+</div></section>
+<script>
+var Q=[
+ {d:'Intent',q:'When a feature is handed to an engineer or agent, what does "done" look like?',o:['A ticket title','A user story with acceptance criteria','Measurable objectives with targets','Objectives with hard floors, constraints and enumerated edge cases'],gap:'Adopt a spec format with objective functions, hard floors and enumerated edge cases (see BIS).',svc:'Intent Sprint'},
+ {d:'Intent',q:'How are non-goals communicated?',o:['They are not','Verbally, in planning','In the ticket, sometimes','Every spec has an explicit do-not-build list'],gap:'Add a mandatory do-not-build list; agents over-deliver without it.',svc:'Intent Sprint'},
+ {d:'Intent',q:'How do your models get domain ground truth?',o:['Whatever is in the prompt','Ad-hoc retrieval over documents','A maintained retrieval pipeline','Ontology, data contracts with freshness and provenance, staleness detection'],gap:'Build context infrastructure: ontology, data contracts, provenance and corruption detection.',svc:'Context Infrastructure Build'},
+ {d:'Topology',q:'When multiple agents or model calls cooperate, how are roles and hand-offs defined?',o:['Emergently, in code','Documented informally','Defined protocols and delegation rules','Protocols, delegation, consensus/tie-break and cost envelopes, all tested'],gap:'Design an explicit topology: roles, protocols, delegation and consensus rules.',svc:'Topology Design'},
+ {d:'Topology',q:'What happens when an agent halts, loops, or drifts from the goal?',o:['We notice when a customer complains','A timeout kills it','Retry logic exists','Deterministic fallback loops: halt, drift, malformed, disagreement, provider failure, budget'],gap:'Implement the six fallback loops with deterministic routes and incident thresholds.',svc:'Topology Design'},
+ {d:'Topology',q:'How do model decisions reach transactional systems (databases, payments, events)?',o:['Directly','Through a service with basic validation','Schema-validated with retries','Idempotent actions, sagas with compensation, replayable event contracts'],gap:'Add a deterministic integration layer: idempotency, sagas, event contracts, replay.',svc:'Deterministic Integration'},
+ {d:'Verification',q:'How is model-driven behaviour tested?',o:['Manual spot checks','Example-based unit tests','Evaluation datasets with thresholds','Property-based tests over invariants plus evals wired into CI'],gap:'Move from examples to property-based tests over stated invariants, gated in CI.',svc:'Behavioural Verification Audit'},
+ {d:'Verification',q:'How do you prevent sensitive data reaching or leaving models?',o:['We prompt the model not to','Some regex filtering','A scrubbing step on inputs','Ingress and egress policy middleware with telemetry and fail-closed behaviour'],gap:'Deploy guardrail middleware at ingress and egress with fail-closed policies.',svc:'Fence Deployment'},
+ {d:'Verification',q:'What happens when a model provider is degraded or down?',o:['The feature is down','Errors surface to users','Retry with backoff','Multi-vendor failover with equivalence tests and a non-AI degraded path'],gap:'Build provider failover and a graceful non-AI degradation path.',svc:'Fence Deployment'},
+ {d:'Accountability',q:'Who is accountable for a wrong automated decision?',o:['Unclear','The engineer who shipped it','The product owner, informally','A sign-off matrix names an accountable role per decision class'],gap:'Create a decision classification and sign-off matrix naming accountable roles.',svc:'Accountability Framework'},
+ {d:'Accountability',q:'How are domain-specific rules (regulatory, clinical, legal, financial) enforced?',o:['We rely on the model knowing them','They are in the system prompt','Some are checked in code','Encoded as hard constraints with a traceability matrix to enforcement points'],gap:'Encode domain rules as hard constraints with regulation-to-enforcement traceability.',svc:'Vertical Knowledge Injection'},
+ {d:'Accountability',q:'Can you produce evidence that a safety property holds, today, for an auditor?',o:['No','We could assemble something in weeks','We have dashboards','A signed evidence table with test runs, probes and telemetry per property'],gap:'Maintain a verification evidence table per safety property, signed by the accountable role.',svc:'Behavioural Verification Audit'}
+];
+var f=document.getElementById('rf');
+f.innerHTML=Q.map(function(x,i){return '<div class="q"><div class="tag">'+x.d+'</div><div><strong>'+(i+1)+'. '+x.q+'</strong></div><div class="opts">'+x.o.map(function(o,j){return '<label><input type="radio" name="q'+i+'" value="'+j+'"> '+o+'</label>'}).join('')+'</div></div>'}).join('');
+function score(){
+  var ans=Q.map(function(_,i){var r=f.querySelector('input[name=q'+i+']:checked');return r?+r.value:null});
+  var answered=ans.filter(function(a){return a!==null}).length; if(!answered)return;
+  var dims={};Q.forEach(function(x,i){dims[x.d]=dims[x.d]||[];if(ans[i]!==null)dims[x.d].push(ans[i])});
+  var total=Math.round(ans.filter(function(a){return a!==null}).reduce(function(s,a){return s+a},0)/(answered*3)*100);
+  document.getElementById('total').textContent=total;
+  document.getElementById('barfill').style.width=total+'%';
+  var band=total<30?'Ad-hoc: AI velocity is outrunning your specification and safety discipline.':total<55?'Emerging: pockets of rigour, but no operating model. Incidents will scale with adoption.':total<80?'Structured: good foundations. The remaining gaps are where audits and outages will come from.':'AI-native: you have the operating model. Focus on vertical depth and continuous re-verification.';
+  document.getElementById('band').textContent=band+(answered<Q.length?' ('+answered+'/'+Q.length+' answered)':'');
+  document.getElementById('dims').innerHTML=Object.keys(dims).map(function(d){var a=dims[d];var p=a.length?Math.round(a.reduce(function(s,x){return s+x},0)/(a.length*3)*100):0;return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:.9rem"><span>'+d+'</span><span class="muted">'+p+'</span></div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}).join('');
+  var gaps=Q.map(function(x,i){return {s:ans[i],x:x}}).filter(function(g){return g.s!==null&&g.s<=1}).sort(function(a,b){return a.s-b.s}).slice(0,4);
+  document.getElementById('gaps').innerHTML=gaps.length?gaps.map(function(g){return '<li><strong style="color:var(--fg)">'+g.x.d+':</strong> '+g.x.gap+' <span class="pill">'+g.x.svc+'</span></li>'}).join(''):'<li>No critical gaps in the answered questions.</li>';
+  window._report='Bison AI-Native Readiness\nScore: '+total+'/100\n'+Object.keys(dims).map(function(d){var a=dims[d];return d+': '+(a.length?Math.round(a.reduce(function(s,x){return s+x},0)/(a.length*3)*100):'-')}).join('\n')+'\n\nTop gaps:\n'+gaps.map(function(g){return '- '+g.x.d+': '+g.x.gap+' ('+g.x.svc+')'}).join('\n');
+  bisonTrack('readiness_score',{total:total});
+}
+function copyReport(){if(window._report)navigator.clipboard.writeText(window._report).then(function(){alert('Report copied.')})}
+</script>
+</main>
+<footer><div class="wrap">
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
+  <div><a href="../docs.html">Spec standard</a> · <a href="../tools/spec-builder.html">Spec Builder</a> · <a href="../tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+</div></footer>
+</body>
+</html>

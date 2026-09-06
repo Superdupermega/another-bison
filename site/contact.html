@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contact — Bison</title>
+<meta name="description" content="Book an intent review or scoping call with Bison.">
+<meta property="og:title" content="Contact — Bison">
+<meta property="og:description" content="Book an intent review or scoping call with Bison.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><span class="mark"></span>BISON</a>
+  <nav><ul>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="method.html">Method</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="tools/spec-builder.html">Spec Builder</a></li>
+    <li><a href="tools/readiness.html">Readiness</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="contact.html">Book a call</a></li>
+  </ul></nav>
+</div></header>
+<main>
+<div class="wrap hero" style="padding-bottom:24px">
+  <div class="kicker">Contact</div>
+  <h1>Book an intent review.</h1>
+  <p class="lead">Forty-five minutes. Bring one thing your team keeps building wrong, or one AI feature you cannot sign off. We will tell you what the spec, topology, or guardrail gap is, at no charge.</p>
+</div>
+<section><div class="wrap">
+  <div class="grid c2">
+    <form id="contactForm" class="card" onsubmit="return bisonSubmit(event)">
+      <label for="name">Name</label><input id="name" name="name" required>
+      <label for="email">Work email</label><input id="email" name="email" type="email" required>
+      <label for="company">Company and role</label><input id="company" name="company" placeholder="Acme · VP Engineering">
+      <label for="interest">What are you looking at?</label>
+      <select id="interest" name="interest">
+        <option>Intent Sprint (start here)</option><option>Topology / multi-agent design</option><option>Deterministic integration</option><option>Verification audit</option><option>Fence guardrail deployment</option><option>Vertical knowledge / regulated domain</option><option>Accountability framework</option><option>Not sure yet</option>
+      </select>
+      <label for="msg">Tell us about the problem</label><textarea id="msg" name="message" placeholder="What keeps getting built wrong, or what can't you sign off?"></textarea>
+      <div style="margin-top:18px"><button class="btn primary" type="submit">Request a call</button></div>
+      <p class="help" id="formStatus" style="margin-top:12px"></p>
+    </form>
+    <div>
+      <div class="card"><h3>Direct</h3><p class="muted"><a href="mailto:hello@bison.systems">hello@bison.systems</a><br>Response within one business day.</p></div>
+      <div class="card" style="margin-top:16px"><h3>Before the call</h3><p class="muted">Run the <a href="tools/readiness.html">readiness scorecard</a> (5 minutes) or draft a spec in the <a href="tools/spec-builder.html">Spec Builder</a> and attach the output. We will review it live.</p></div>
+    </div>
+  </div>
+</div></section>
+<script>
+// Form handling: posts to a configurable endpoint (Formspree/own API); falls back to mailto.
+var BISON_FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxx"
+function bisonSubmit(e){
+  e.preventDefault();
+  var f=e.target, s=document.getElementById('formStatus');
+  var data=Object.fromEntries(new FormData(f).entries());
+  bisonTrack('contact_submit',{interest:data.interest});
+  if(BISON_FORM_ENDPOINT){
+    s.textContent='Sending…';
+    fetch(BISON_FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
+      .then(function(r){ s.textContent = r.ok ? 'Thanks. We will reply within one business day.' : 'Something went wrong. Email hello@bison.systems instead.'; if(r.ok) f.reset(); })
+      .catch(function(){ s.textContent='Network error. Email hello@bison.systems instead.'; });
+  } else {
+    var body='Name: '+data.name+'\nEmail: '+data.email+'\nCompany: '+data.company+'\nInterest: '+data.interest+'\n\n'+data.message;
+    location.href='mailto:hello@bison.systems?subject='+encodeURIComponent('Intent review request — '+data.company)+'&body='+encodeURIComponent(body);
+    s.textContent='Opening your email client. If nothing happens, email hello@bison.systems.';
+  }
+  return false;
+}
+</script>
+</main>
+<footer><div class="wrap">
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
+  <div><a href="docs.html">Spec standard</a> · <a href="tools/spec-builder.html">Spec Builder</a> · <a href="tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+</div></footer>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Method — Bison</title>
+<meta name="description" content="The Bison method: Frame, Specify, Prove, Verify. How we turn intent into deterministic, verifiable AI-native systems.">
+<meta property="og:title" content="Method — Bison">
+<meta property="og:description" content="The Bison method: Frame, Specify, Prove, Verify. How we turn intent into deterministic, verifiable AI-native systems.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><span class="mark"></span>BISON</a>
+  <nav><ul>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="method.html">Method</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="tools/spec-builder.html">Spec Builder</a></li>
+    <li><a href="tools/readiness.html">Readiness</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="contact.html">Book a call</a></li>
+  </ul></nav>
+</div></header>
+<main>
+<div class="wrap hero" style="padding-bottom:24px">
+  <div class="kicker">Method</div>
+  <h1>Frame. Specify. Prove. Verify.</h1>
+  <p class="lead">Our method is built on one test: <em>an autonomous coding agent must be able to implement the specification without asking a single clarifying question.</em> If it has to ask, the spec is the bug.</p>
+</div>
+
+<section><div class="wrap">
+  <h2>Principles</h2>
+  <div class="grid c2">
+    <div class="card"><h3>Intent is the source code</h3><p class="muted">Implementation is generated and regenerated. The spec is what humans author, review, and version. We treat it with the rigour code used to get.</p></div>
+    <div class="card"><h3>Every constraint has an enforcement point</h3><p class="muted">"The model should never…" is a wish. A constraint names the middleware, router, schema, or test that makes violation impossible or detectable.</p></div>
+    <div class="card"><h3>Non-determinism stops at the boundary</h3><p class="muted">Models propose; deterministic systems dispose. Every model output passes through schema validation, policy checks, and a transactional boundary before it touches state.</p></div>
+    <div class="card"><h3>Evidence over assurance</h3><p class="muted">We do not say a system is safe. We show the property tests, the probe results, and the telemetry, and name the human who signed off on the residual risk.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>The four phases</h2>
+  <div class="steps">
+    <div class="step"><div><h3>Frame · days 1–2</h3><p class="muted">Workshop with the accountable decision owner. Output: outcome statement, objective function with priorities and hard floors, decision class and risk tolerance, do-not-build list. We refuse to proceed without a named accountable role.</p></div></div>
+    <div class="step"><div><h3>Specify · days 3–7</h3><p class="muted">Constraints with enforcement points and verification references. Edge-case table. Interface and data contracts with freshness and provenance. Acceptance tests as executable statements. The spec passes BIS-lint before anyone writes code.</p></div></div>
+    <div class="step"><div><h3>Prove · days 8–11</h3><p class="muted">Autonomous agents implement from the spec in a clean environment. Every clarifying question the agent raises is logged as a spec defect and fixed upstream. The reference implementation is a by-product; the hardened spec is the deliverable.</p></div></div>
+    <div class="step"><div><h3>Verify · days 12–14</h3><p class="muted">Property-based tests against every objective, constraint, and edge case. Security probes on model-exposed surfaces. Telemetry wired to hard floors so a breach is an incident, not a dashboard trend. Evidence table filled and signed.</p></div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Reference topology</h2>
+  <p class="muted">Most agentic systems we design reduce to this shape. Autonomy lives in the middle; everything at the edges is deterministic and auditable.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Layer</th><th>Responsibility</th><th>Deterministic?</th><th>Bison artifact</th></tr>
+    <tr><td>Intent</td><td>Objective function, constraints, edge cases</td><td>Yes (BIS document)</td><td>Intent Spec</td></tr>
+    <tr><td>Context</td><td>Ontology, retrieval, data contracts, provenance</td><td>Yes (contracts) / No (retrieval ranking)</td><td>Context Infrastructure</td></tr>
+    <tr><td>Fence (ingress)</td><td>Policy checks on what reaches the model: PII scrubbing, prompt injection detection, budget</td><td>Yes</td><td>Fence policy set</td></tr>
+    <tr><td>Agents</td><td>Planning, delegation, tool use, consensus</td><td>No</td><td>Topology ADRs, protocol schemas</td></tr>
+    <tr><td>Fence (egress)</td><td>Output schema enforcement, hallucination and toxicity checks, leakage prevention, failover</td><td>Yes</td><td>Fence policy set</td></tr>
+    <tr><td>Integration</td><td>Idempotent actions, sagas, event contracts, replay</td><td>Yes</td><td>Deterministic Integration code</td></tr>
+    <tr><td>Verification</td><td>Property tests, probes, telemetry, evidence</td><td>Yes</td><td>Verification suite, evidence table</td></tr>
+    <tr><td>Accountability</td><td>Risk tolerance, sign-off matrix, regulatory mapping</td><td>Yes</td><td>Accountability Framework</td></tr>
+  </table></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Fallback loops we always build</h2>
+  <div class="grid c3">
+    <div class="card"><h3>Halt</h3><p class="muted">Agent produces no output within budget. Route: retry with a smaller model once, then queue for human, never auto-complete.</p></div>
+    <div class="card"><h3>Drift</h3><p class="muted">Agent output diverges from the objective function (measured by a deterministic scorer). Route: reset context to last checkpoint, re-plan, escalate on second drift.</p></div>
+    <div class="card"><h3>Malformed</h3><p class="muted">Output fails schema. Route: one structured repair attempt, then fail closed with a typed error the caller must handle.</p></div>
+    <div class="card"><h3>Disagreement</h3><p class="muted">Consensus agents disagree beyond threshold. Route: tie-break by pre-declared rule (conservative option wins) or human.</p></div>
+    <div class="card"><h3>Provider failure</h3><p class="muted">Model unavailable or degraded. Route: multi-vendor failover with equivalence tests, then graceful degradation to non-AI path.</p></div>
+    <div class="card"><h3>Budget breach</h3><p class="muted">Cost or latency envelope exceeded. Route: hard stop, incident, never silently continue.</p></div>
+  </div>
+  <p style="margin-top:32px"><a class="btn primary" href="tools/spec-builder.html">Draft a spec with the Spec Builder</a> <a class="btn" href="docs.html">Read the BIS standard</a></p>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
+  <div><a href="docs.html">Spec standard</a> · <a href="tools/spec-builder.html">Spec Builder</a> · <a href="tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+</div></footer>
+</body>
+</html>

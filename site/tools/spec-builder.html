@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec Builder — Bison</title>
+<meta name="description" content="Draft a Bison Intent Spec in your browser. Constraints, edge cases, objective functions and acceptance tests, lint-checked against BIS v0.1.">
+<meta property="og:title" content="Spec Builder — Bison">
+<meta property="og:description" content="Draft a Bison Intent Spec in your browser. Constraints, edge cases, objective functions and acceptance tests, lint-checked against BIS v0.1.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/site.js"></script>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="../index.html"><span class="mark"></span>BISON</a>
+  <nav><ul>
+    <li><a href="../services.html">Services</a></li>
+    <li><a href="../method.html">Method</a></li>
+    <li><a href="../pricing.html">Pricing</a></li>
+    <li><a href="../tools/spec-builder.html">Spec Builder</a></li>
+    <li><a href="../tools/readiness.html">Readiness</a></li>
+    <li><a href="../about.html">About</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="../contact.html">Book a call</a></li>
+  </ul></nav>
+</div></header>
+<main>
+<div class="wrap hero" style="padding-bottom:16px">
+  <div class="kicker">Free tool</div>
+  <h1>Intent Spec Builder</h1>
+  <p class="lead">Turn a fuzzy requirement into a <a href="../docs.html">BIS v0.1</a> intent spec your coding agents can execute. Everything runs in your browser; nothing is sent anywhere until you choose to.</p>
+</div>
+<section style="padding-top:24px"><div class="wrap">
+<div class="grid c2" style="align-items:start">
+<form id="specForm" class="card" oninput="renderSpec()" onsubmit="return false">
+  <div class="tag">1 · Header</div>
+  <label>Title</label><input id="title" placeholder="Refund eligibility decision service">
+  <div class="row">
+    <div><label>Accountable owner (role, not name)</label><input id="owner" placeholder="Head of Payments"></div>
+    <div><label>Decision class</label><select id="dclass"><option>informational</option><option>operational</option><option selected>financial</option><option>safety</option><option>legal</option></select></div>
+    <div><label>Risk tolerance</label><select id="risk"><option>low</option><option>medium</option><option>high</option></select></div>
+  </div>
+  <div class="tag" style="margin-top:24px;display:block">2 · Outcome</div>
+  <label>Outcome statement (observable, measurable, no implementation words)</label>
+  <textarea id="outcome" placeholder="Customers with eligible orders receive a refund decision within 2 seconds, with ≤0.1% incorrect approvals and zero incorrect denials over any rolling 30-day window."></textarea>
+
+  <div class="tag" style="margin-top:24px;display:block">3 · Objectives (one per line: objective | metric | target | hard floor)</div>
+  <textarea id="objectives" placeholder="Correct denials | false-deny rate | 0% | 0%
+Latency | p95 decision time | 2s | 5s
+Cost | model spend per decision | $0.004 | $0.01"></textarea>
+
+  <div class="tag" style="margin-top:24px;display:block">4 · Constraints (one per line: rule | enforced at | verified by)</div>
+  <textarea id="constraints" placeholder="Never expose payment instrument to model context | fence.policy.pii_egress | PT-C1
+Refunds above $500 always route to a human | topology.router.threshold | PT-C2"></textarea>
+
+  <div class="tag" style="margin-top:24px;display:block">5 · Edge cases (one per line: condition | expected behaviour)</div>
+  <textarea id="edges" placeholder="Order older than 180 days | Deny with reason expired_window
+Model returns non-parseable output | Route to human, log model_malformed
+Model unavailable > 3s | Queue, notify customer, never auto-approve"></textarea>
+
+  <div class="tag" style="margin-top:24px;display:block">6 · Inputs (one per line: name | source | freshness)</div>
+  <textarea id="inputs" placeholder="order | orders-db | ≤5s
+policy | policy-repo | on-deploy"></textarea>
+
+  <div class="tag" style="margin-top:24px;display:block">7 · Do-not-build (one per line)</div>
+  <textarea id="nonGoals" placeholder="Customer-facing appeals flow (separate spec)
+Fraud scoring; consume existing fraud service"></textarea>
+
+  <div class="tag" style="margin-top:24px;display:block">8 · Regulatory mapping (optional, one per line: regulation | constraint ids)</div>
+  <textarea id="reg" placeholder="PSD2 Art. 73 | C2, E3"></textarea>
+
+  <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn" type="button" onclick="loadExample()">Load example</button>
+    <button class="btn" type="button" onclick="copySpec()">Copy YAML</button>
+    <button class="btn" type="button" onclick="downloadSpec()">Download .bis.yaml</button>
+    <a class="btn primary" id="reviewLink" href="../contact.html">Have Bison review this →</a>
+  </div>
+</form>
+<div>
+  <div class="card">
+    <div class="tag">BIS-lint</div>
+    <ul class="lint" id="lint"></ul>
+  </div>
+  <pre class="out" id="out" style="margin-top:16px"># fill in the form to generate your spec</pre>
+</div>
+</div>
+</div></section>
+<script>
+function lines(id){return document.getElementById(id).value.split('\n').map(function(s){return s.trim()}).filter(Boolean)}
+function cols(l){return l.split('|').map(function(s){return s.trim()})}
+function v(id){return document.getElementById(id).value.trim()}
+function yq(s){return JSON.stringify(s)}
+function buildSpec(){
+  var objs=lines('objectives').map(cols), cons=lines('constraints').map(cols), edges=lines('edges').map(cols), ins=lines('inputs').map(cols), ng=lines('nonGoals'), reg=lines('reg').map(cols);
+  var id='BIS-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000);
+  var y=[];
+  y.push('bis: "0.1"','id: '+id,'title: '+yq(v('title')||'<untitled>'),'owner: '+yq(v('owner')||'<accountable role>'),'decision_class: '+v('dclass'),'risk_tolerance: '+v('risk'),'status: draft','');
+  y.push('outcome: >-','  '+(v('outcome')||'<observable, measurable outcome>').replace(/\n/g,'\n  '),'');
+  y.push('objectives:');
+  objs.forEach(function(o,i){y.push('  - priority: '+(i+1),'    objective: '+yq(o[0]||''),'    metric: '+yq(o[1]||''),'    target: '+yq(o[2]||''),'    hard_floor: '+yq(o[3]||''))});
+  if(!objs.length)y.push('  []');
+  y.push('','constraints:');
+  cons.forEach(function(c,i){y.push('  - id: C'+(i+1),'    rule: '+yq(c[0]||''),'    enforced_at: '+yq(c[1]||''),'    verified_by: '+yq(c[2]||''))});
+  if(!cons.length)y.push('  []');
+  y.push('','edge_cases:');
+  edges.forEach(function(e,i){y.push('  - id: E'+(i+1),'    condition: '+yq(e[0]||''),'    expected: '+yq(e[1]||''))});
+  if(!edges.length)y.push('  []');
+  y.push('','inputs:');
+  ins.forEach(function(n){y.push('  '+(n[0]||'input')+': {source: '+yq(n[1]||'')+', freshness: '+yq(n[2]||'')+'}')});
+  if(!ins.length)y.push('  {}');
+  y.push('','do_not_build:');ng.forEach(function(n){y.push('  - '+yq(n))});if(!ng.length)y.push('  []');
+  y.push('','acceptance:');
+  cons.forEach(function(c,i){y.push('  - id: '+(c[2]||('PT-C'+(i+1))),'    type: property','    covers: C'+(i+1),'    statement: '+yq('∀ input: '+(c[0]||'')))});
+  edges.forEach(function(e,i){y.push('  - id: AT-E'+(i+1),'    type: scenario','    covers: E'+(i+1),'    statement: '+yq('Given '+(e[0]||'')+', then '+(e[1]||'')))});
+  objs.forEach(function(o,i){y.push('  - id: MT-O'+(i+1),'    type: metric','    covers: O'+(i+1),'    statement: '+yq((o[1]||'metric')+' ≤ hard floor '+(o[3]||'?')+' over rolling window'))});
+  if(!cons.length&&!edges.length&&!objs.length)y.push('  []');
+  y.push('','regulatory_mapping:');reg.forEach(function(r){y.push('  - regulation: '+yq(r[0]||'')+'\n    covers: '+yq(r[1]||''))});if(!reg.length)y.push('  []');
+  y.push('','verification_evidence: []  # filled at verification time');
+  return {yaml:y.join('\n'),objs:objs,cons:cons,edges:edges,ins:ins,ng:ng};
+}
+function lint(s){
+  var f=[];
+  function add(cls,code,msg){f.push('<li class="'+cls+'"><strong>'+code+'</strong> '+msg+'</li>')}
+  if(!v('title'))add('fail','BIS000','Title is empty.');
+  var own=v('owner');
+  if(!own)add('fail','BIS005','Accountable owner is required and must be a role.');
+  else if(/^[A-Z][a-z]+ [A-Z][a-z]+$/.test(own)&&!/head|chief|lead|owner|officer|director|manager|vp/i.test(own))add('warn','BIS005','Owner looks like a person\'s name; use a role.');
+  if(!v('outcome'))add('fail','BIS010','Outcome statement is empty.');
+  else if(/\b(use|implement|build|call|via|with)\b.*\b(api|model|llm|gpt|claude|database|queue|service)\b/i.test(v('outcome')))add('warn','BIS011','Outcome contains implementation language; state the observable result only.');
+  if(!s.objs.length)add('fail','BIS002','At least one objective with a hard floor is required.');
+  s.objs.forEach(function(o,i){if(!o[3])add('fail','BIS002','Objective '+(i+1)+' has no hard floor.')});
+  if(!s.cons.length)add('warn','BIS001','No constraints. Most real systems have at least one "never".');
+  s.cons.forEach(function(c,i){if(!c[1])add('fail','BIS001','Constraint C'+(i+1)+' has no enforcement point.');if(!c[2])add('warn','BIS001','Constraint C'+(i+1)+' has no verification reference; one was generated.')});
+  if(s.edges.length<3)add('warn','BIS003','Fewer than 3 edge cases. Add model-failure cases: malformed output, timeout, provider down.');
+  s.edges.forEach(function(e,i){if(!e[1])add('fail','BIS003','Edge case E'+(i+1)+' has no expected behaviour.')});
+  var txt=(v('edges')+' '+v('constraints')).toLowerCase();
+  if(!/timeout|unavailable|down|malformed|parse|fail/.test(txt))add('warn','BIS012','No model-failure fallback described. What happens when the model halts or returns garbage?');
+  if(!s.ins.length)add('warn','BIS013','No inputs declared; every decision depends on data with a source and freshness.');
+  if(!s.ng.length)add('fail','BIS004','Do-not-build list is empty. Agents over-deliver without explicit non-goals.');
+  if(/financial|safety|legal/.test(v('dclass'))&&v('risk')!=='low')add('fail','BIS007','Decision class '+v('dclass')+' requires risk_tolerance: low or an explicit signed override.');
+  var fails=f.filter(function(x){return x.indexOf('class="fail"')>-1}).length;
+  if(!f.length)add('ok','PASS','Spec passes BIS-lint. Ready for an implementation pass.');
+  else if(!fails)add('ok','OK','No blocking findings. Warnings should be resolved before implementation.');
+  return f.join('');
+}
+function renderSpec(){var s=buildSpec();document.getElementById('out').textContent=s.yaml;document.getElementById('lint').innerHTML=lint(s);
+  try{localStorage.setItem('bis-draft',JSON.stringify(['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'].map(function(i){return document.getElementById(i).value})))}catch(e){}
+  bisonTrack('spec_edit');}
+function copySpec(){navigator.clipboard.writeText(document.getElementById('out').textContent).then(function(){alert('Copied.')})}
+function downloadSpec(){var b=new Blob([document.getElementById('out').textContent],{type:'text/yaml'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(v('title')||'intent').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.bis.yaml';a.click();bisonTrack('spec_download')}
+function loadExample(){
+  var ex={title:'Refund eligibility decision service',owner:'Head of Payments',dclass:'financial',risk:'low',
+  outcome:'Customers with eligible orders receive a refund decision within 2 seconds, with ≤0.1% incorrect approvals and zero incorrect denials over any rolling 30-day window.',
+  objectives:'Correct denials | false-deny rate | 0% | 0%\nCorrect approvals | false-approve rate | 0.1% | 0.5%\nLatency | p95 decision time | 2s | 5s\nCost | model spend per decision | $0.004 | $0.01',
+  constraints:'Never expose a customer payment instrument to the model context | fence.policy.pii_egress | PT-C1\nRefunds above $500 always route to a human | topology.router.threshold | PT-C2\nEvery decision is written to the audit stream before the customer is notified | integration.saga.step2 | PT-C3',
+  edges:'Order older than 180 days | Deny with reason expired_window\nPartial refund already issued | Evaluate remaining balance only\nModel returns non-parseable output | One structured repair attempt, then route to human and log model_malformed\nModel unavailable > 3s | Queue decision, notify customer of delay, never auto-approve\nTwo consensus agents disagree | Conservative option (deny-and-escalate) wins',
+  inputs:'order | orders-db | ≤5s\npolicy | policy-repo | on-deploy\nfraud_score | fraud-service | ≤60s',
+  nonGoals:'Customer-facing appeals flow (separate spec)\nFraud scoring; consume the existing fraud service\nMulti-currency conversion',
+  reg:'PSD2 Art. 73 | C2, E4\nInternal Refund Policy v7 | C1, C3'};
+  Object.keys(ex).forEach(function(k){document.getElementById(k).value=ex[k]});renderSpec();
+}
+(function(){try{var d=JSON.parse(localStorage.getItem('bis-draft'));if(d){['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'].forEach(function(id,i){document.getElementById(id).value=d[i]||''})}}catch(e){}renderSpec();})();
+</script>
+</main>
+<footer><div class="wrap">
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
+  <div><a href="../docs.html">Spec standard</a> · <a href="../tools/spec-builder.html">Spec Builder</a> · <a href="../tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+</div></footer>
+</body>
+</html>

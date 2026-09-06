@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BIS Standard — Bison</title>
+<meta name="description" content="The Bison Intent Spec v0.1: an open format for machine-executable software specifications.">
+<meta property="og:title" content="BIS Standard — Bison">
+<meta property="og:description" content="The Bison Intent Spec v0.1: an open format for machine-executable software specifications.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/site.js"></script>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><span class="mark"></span>BISON</a>
+  <nav><ul>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="method.html">Method</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="tools/spec-builder.html">Spec Builder</a></li>
+    <li><a href="tools/readiness.html">Readiness</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="contact.html">Book a call</a></li>
+  </ul></nav>
+</div></header>
+<main>
+<div class="wrap hero" style="padding-bottom:16px">
+  <div class="kicker">Open standard</div>
+  <h1>Bison Intent Spec (BIS) v0.1</h1>
+  <p class="lead">A structured format for stating what software must do with enough precision that an autonomous coding agent can implement it without asking questions, and a verification system can prove it did. Intentionally boring. Every section is mandatory.</p>
+  <div class="cta-row"><a class="btn primary" href="tools/spec-builder.html">Open the Spec Builder</a><a class="btn" href="https://github.com/superdupermega/another-bison/blob/main/docs/05-spec-standard.md">Source on GitHub</a></div>
+</div>
+<section style="padding-top:24px"><div class="wrap" style="max-width:860px">
+<p>BIS is a structured format for stating <strong>what a piece of software must do</strong> with</p>
+<p>enough precision that an autonomous coding agent can implement it without asking</p>
+<p>questions, and a verification system can prove it did.</p>
+<p>It is intentionally boring. Every section is mandatory. Empty sections are a</p>
+<p>finding, not an omission.</p>
+<h2 style="margin-top:40px">1. Header</h2>
+<pre class="out">
+bis: &quot;0.1&quot;
+id: BIS-2026-0042
+title: Refund eligibility decision service
+owner: Head of Payments          # the accountable human, by role
+decision_class: financial        # informational | operational | financial | safety | legal
+risk_tolerance: low              # see §7
+status: draft | approved | implemented | verified
+</pre>
+<h2 style="margin-top:40px">2. Outcome statement</h2>
+<p>One paragraph. What changes in the world when this is done, stated as an</p>
+<p>observable, measurable result. No implementation language.</p>
+<p class="quote">Customers with eligible orders receive a refund decision within 2 seconds, with</p>
+<p class="quote">≤0.1% incorrect approvals and zero incorrect denials over any rolling 30-day window.</p>
+<h2 style="margin-top:40px">3. Objective function</h2>
+<p>What the system optimises, in priority order, with the metric and the unit.</p>
+<div class="tablewrap"><table>
+<tr><th>Priority</th><th>Objective</th><th>Metric</th><th>Target</th><th>Hard floor</th></tr>
+<tr><td>1</td><td>Correct denials</td><td>false-deny rate</td><td>0%</td><td>0%</td></tr>
+<tr><td>2</td><td>Correct approvals</td><td>false-approve rate</td><td>≤0.1%</td><td>≤0.5%</td></tr>
+<tr><td>3</td><td>Latency</td><td>p95 decision time</td><td>≤2s</td><td>≤5s</td></tr>
+<tr><td>4</td><td>Cost</td><td>model spend per decision</td><td>≤$0.004</td><td>≤$0.01</td></tr>
+</table></div>
+<p>A hard floor breach is an incident, not a regression.</p>
+<h2 style="margin-top:40px">4. Constraints</h2>
+<p>Rules that must never be violated. Each one has an enforcement point.</p>
+<pre class="out">
+constraints:
+  - id: C1
+    rule: &quot;Never expose a customer&#x27;s payment instrument to the model context.&quot;
+    enforced_at: fence.policy.pii_egress
+    verified_by: property test PT-C1
+  - id: C2
+    rule: &quot;Refunds above $500 always route to a human.&quot;
+    enforced_at: topology.router.threshold
+    verified_by: property test PT-C2
+</pre>
+<h2 style="margin-top:40px">5. Edge-case parameters</h2>
+<p>Enumerated, not implied. Every edge case names the expected behaviour.</p>
+<div class="tablewrap"><table>
+<tr><th>ID</th><th>Condition</th><th>Expected behaviour</th></tr>
+<tr><td>E1</td><td>Order older than 180 days</td><td>Deny with reason <code>expired_window</code></td></tr>
+<tr><td>E2</td><td>Partial refund already issued</td><td>Evaluate remaining balance only</td></tr>
+<tr><td>E3</td><td>Model returns non-parseable output</td><td>Fallback: route to human, log <code>model_malformed</code></td></tr>
+<tr><td>E4</td><td>Model unavailable &gt; 3s</td><td>Fallback: queue, notify customer of delay, never auto-approve</td></tr>
+</table></div>
+<h2 style="margin-top:40px">6. Interfaces and data contracts</h2>
+<p>Inputs, outputs, and the provenance of every field the decision depends on.</p>
+<pre class="out">
+inputs:
+  order:        {source: orders-db, freshness: &quot;≤5s&quot;, schema: schemas/order.v3.json}
+  policy:       {source: policy-repo, freshness: &quot;on-deploy&quot;, schema: schemas/refund-policy.v1.json}
+outputs:
+  decision:     {schema: schemas/refund-decision.v1.json, sink: decisions-stream}
+</pre>
+<h2 style="margin-top:40px">7. Risk tolerance and accountability</h2>
+<pre class="out">
+risk_tolerance: low
+accountable_owner: Head of Payments
+sign_off_required_for:
+  - constraint changes
+  - objective target changes
+  - fallback behaviour changes
+regulatory_mapping:
+  - PSD2 Art. 73 → C2, E4
+</pre>
+<h2 style="margin-top:40px">8. Do-not-build list</h2>
+<p>Explicit non-goals so agents do not over-deliver.</p>
+<ul class="muted">
+<li>Do not build a customer-facing appeals flow (separate spec).</li>
+<li>Do not implement fraud scoring; consume the existing fraud service.</li>
+</ul>
+<h2 style="margin-top:40px">9. Acceptance tests</h2>
+<p>Each objective, constraint, and edge case maps to at least one test. Tests are</p>
+<p>executable, not prose.</p>
+<pre class="out">
+acceptance:
+  - id: PT-C1
+    type: property
+    statement: &quot;∀ request: model_context ∩ payment_instrument_fields = ∅&quot;
+  - id: AT-E4
+    type: scenario
+    statement: &quot;Given model timeout of 4s, decision is &#x27;queued&#x27; and no approval event emitted&quot;
+</pre>
+<h2 style="margin-top:40px">10. Verification evidence (filled at verification time)</h2>
+<div class="tablewrap"><table>
+<tr><th>Test</th><th>Run</th><th>Result</th><th>Evidence</th></tr>
+<tr><td>PT-C1</td><td>2026-09-14 ci#8812</td><td>pass (10,000 cases)</td><td>link</td></tr>
+</table></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:32px 0">
+<h3 style="margin-top:28px">Validator rules (BIS-lint)</h3>
+<ul class="muted">
+<li><code>BIS001</code> Every constraint has <code>enforced<em>at</code> and <code>verified</em>by</code>.</li>
+<li><code>BIS002</code> Every objective has a hard floor.</li>
+<li><code>BIS003</code> Every edge case has an expected behaviour.</li>
+<li><code>BIS004</code> Do-not-build list is non-empty.</li>
+<li><code>BIS005</code> Accountable owner is a role, not a person&#x27;s name.</li>
+<li><code>BIS006</code> Every acceptance test references an objective, constraint, or edge case.</li>
+<li><code>BIS007</code> <code>decision<em>class</code> of <code>financial</code>, <code>safety</code>, or <code>legal</code> requires <code>risk</em>tolerance: low</code> or an explicit override with sign-off.</li>
+</ul>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
+  <div><a href="docs.html">Spec standard</a> · <a href="tools/spec-builder.html">Spec Builder</a> · <a href="tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+</div></footer>
+</body>
+</html>
