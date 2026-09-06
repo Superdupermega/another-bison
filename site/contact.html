@@ -9,6 +9,7 @@
 <meta property="og:description" content="Book an intent review or scoping call with Bison.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
 <script src="assets/site.js"></script>
 </head>
 <body>
@@ -16,12 +17,13 @@
   <a class="brand" href="index.html"><span class="mark"></span>BISON</a>
   <nav><ul>
     <li><a href="services.html">Services</a></li>
+    <li><a href="products.html">Products</a></li>
     <li><a href="method.html">Method</a></li>
+    <li><a href="sss.html">SSS</a></li>
+    <li><a href="certification.html">Certification</a></li>
     <li><a href="pricing.html">Pricing</a></li>
-    <li><a href="tools/spec-builder.html">Spec Builder</a></li>
-    <li><a href="tools/readiness.html">Readiness</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a class="btn primary" style="padding:8px 14px" href="contact.html">Book a call</a></li>
+    <li><a href="tools/spec-builder.html">Tools</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="contact.html" data-book>Book a call</a></li>
   </ul></nav>
 </div></header>
 <main>
@@ -45,14 +47,15 @@
       <p class="help" id="formStatus" style="margin-top:12px"></p>
     </form>
     <div>
-      <div class="card"><h3>Direct</h3><p class="muted"><a href="mailto:hello@bison.systems">hello@bison.systems</a><br>Response within one business day.</p></div>
+      <div class="card"><h3>Prefer a calendar?</h3><p class="muted">Pick a 45-minute slot directly.</p><a class="btn primary" href="contact.html#contactForm" data-book>Open calendar</a></div>
+      <div class="card" style="margin-top:16px"><h3>Direct</h3><p class="muted"><a href="mailto:hello@bison.systems">hello@bison.systems</a><br>Response within one business day.</p></div>
       <div class="card" style="margin-top:16px"><h3>Before the call</h3><p class="muted">Run the <a href="tools/readiness.html">readiness scorecard</a> (5 minutes) or draft a spec in the <a href="tools/spec-builder.html">Spec Builder</a> and attach the output. We will review it live.</p></div>
     </div>
   </div>
 </div></section>
 <script>
 // Form handling: posts to a configurable endpoint (Formspree/own API); falls back to mailto.
-var BISON_FORM_ENDPOINT = ""; // e.g. "https://formspree.io/f/xxxxxxx"
+var BISON_FORM_ENDPOINT = (window.BISON||{}).FORM_ENDPOINT || "";
 function bisonSubmit(e){
   e.preventDefault();
   var f=e.target, s=document.getElementById('formStatus');
@@ -70,11 +73,10 @@ function bisonSubmit(e){
   }
   return false;
 }
-</script>
-</main>
+</script></main>
 <footer><div class="wrap">
-  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
-  <div><a href="docs.html">Spec standard</a> · <a href="tools/spec-builder.html">Spec Builder</a> · <a href="tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.<br><a href="neutrality.html">Vendor-neutrality charter</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+  <div><a href="docs.html">BIS standard</a> · <a href="sss.html">Spec Sufficiency Score</a> · <a href="glossary.html">Glossary</a> · <a href="tools/spec-builder.html">Spec Builder</a> · <a href="tools/readiness.html">Readiness</a> · <a href="about.html">About</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
 </div></footer>
 </body>
 </html>

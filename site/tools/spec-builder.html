@@ -9,6 +9,7 @@
 <meta property="og:description" content="Draft a Bison Intent Spec in your browser. Constraints, edge cases, objective functions and acceptance tests, lint-checked against BIS v0.1.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/config.js"></script>
 <script src="../assets/site.js"></script>
 </head>
 <body>
@@ -16,12 +17,13 @@
   <a class="brand" href="../index.html"><span class="mark"></span>BISON</a>
   <nav><ul>
     <li><a href="../services.html">Services</a></li>
+    <li><a href="../products.html">Products</a></li>
     <li><a href="../method.html">Method</a></li>
+    <li><a href="../sss.html">SSS</a></li>
+    <li><a href="../certification.html">Certification</a></li>
     <li><a href="../pricing.html">Pricing</a></li>
-    <li><a href="../tools/spec-builder.html">Spec Builder</a></li>
-    <li><a href="../tools/readiness.html">Readiness</a></li>
-    <li><a href="../about.html">About</a></li>
-    <li><a class="btn primary" style="padding:8px 14px" href="../contact.html">Book a call</a></li>
+    <li><a href="../tools/spec-builder.html">Tools</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="../contact.html" data-book>Book a call</a></li>
   </ul></nav>
 </div></header>
 <main>
@@ -146,8 +148,8 @@ function lint(s){
 function renderSpec(){var s=buildSpec();document.getElementById('out').textContent=s.yaml;document.getElementById('lint').innerHTML=lint(s);
   try{localStorage.setItem('bis-draft',JSON.stringify(['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'].map(function(i){return document.getElementById(i).value})))}catch(e){}
   bisonTrack('spec_edit');}
-function copySpec(){navigator.clipboard.writeText(document.getElementById('out').textContent).then(function(){alert('Copied.')})}
-function downloadSpec(){var b=new Blob([document.getElementById('out').textContent],{type:'text/yaml'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(v('title')||'intent').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.bis.yaml';a.click();bisonTrack('spec_download')}
+function copySpec(){bisonCapture('spec-builder-copy',{title:v('title')},function(){navigator.clipboard.writeText(document.getElementById('out').textContent).then(function(){alert('Copied.')})})}
+function downloadSpec(){bisonCapture('spec-builder-download',{title:v('title')},function(){var b=new Blob([document.getElementById('out').textContent],{type:'text/yaml'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(v('title')||'intent').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.bis.yaml';a.click();bisonTrack('spec_download')})}
 function loadExample(){
   var ex={title:'Refund eligibility decision service',owner:'Head of Payments',dclass:'financial',risk:'low',
   outcome:'Customers with eligible orders receive a refund decision within 2 seconds, with ≤0.1% incorrect approvals and zero incorrect denials over any rolling 30-day window.',
@@ -160,11 +162,10 @@ function loadExample(){
   Object.keys(ex).forEach(function(k){document.getElementById(k).value=ex[k]});renderSpec();
 }
 (function(){try{var d=JSON.parse(localStorage.getItem('bis-draft'));if(d){['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'].forEach(function(id,i){document.getElementById(id).value=d[i]||''})}}catch(e){}renderSpec();})();
-</script>
-</main>
+</script></main>
 <footer><div class="wrap">
-  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
-  <div><a href="../docs.html">Spec standard</a> · <a href="../tools/spec-builder.html">Spec Builder</a> · <a href="../tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.<br><a href="../neutrality.html">Vendor-neutrality charter</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></div>
+  <div><a href="../docs.html">BIS standard</a> · <a href="../sss.html">Spec Sufficiency Score</a> · <a href="../glossary.html">Glossary</a> · <a href="../tools/spec-builder.html">Spec Builder</a> · <a href="../tools/readiness.html">Readiness</a> · <a href="../about.html">About</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
 </div></footer>
 </body>
 </html>

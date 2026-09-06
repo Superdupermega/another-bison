@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spec Sufficiency Score — Bison</title>
+<meta name="description" content="The Spec Sufficiency Score: a public formula measuring whether a specification can be implemented by autonomous agents without clarifying questions.">
+<meta property="og:title" content="Spec Sufficiency Score — Bison">
+<meta property="og:description" content="The Spec Sufficiency Score: a public formula measuring whether a specification can be implemented by autonomous agents without clarifying questions.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<script src="assets/site.js"></script>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><span class="mark"></span>BISON</a>
+  <nav><ul>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="method.html">Method</a></li>
+    <li><a href="sss.html">SSS</a></li>
+    <li><a href="certification.html">Certification</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="tools/spec-builder.html">Tools</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="contact.html" data-book>Book a call</a></li>
+  </ul></nav>
+</div></header>
+<main>
+<div class="wrap hero" style="padding-bottom:24px">
+  <div class="kicker">Open metric</div>
+  <h1>Spec Sufficiency Score</h1>
+  <p class="lead">A spec that scores 90 can be handed to any agent, any vendor, any contractor. A spec that scores 40 will be built wrong four times. SSS turns "is this spec good enough?" into a number you can track, require in a contract, and show a regulator.</p>
+</div>
+<section><div class="wrap">
+  <h2>How it is computed</h2>
+  <p class="muted">Run the spec through <em>N</em> independent autonomous coding agents in clean environments (we use N = 3 across at least two model vendors). Measure four things and combine them.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Component</th><th>Measure</th><th>Weight</th><th>Why</th></tr>
+    <tr><td><strong>Q</strong> · Question rate</td><td>Clarifying questions raised per agent, normalised: Q = max(0, 1 − questions / 5)</td><td>35%</td><td>Every question is a spec defect. Zero questions is the goal.</td></tr>
+    <tr><td><strong>P</strong> · First-pass rate</td><td>Share of acceptance tests passing on the agent's first submission, averaged across agents</td><td>35%</td><td>Sufficiency means the agent knew what "done" was.</td></tr>
+    <tr><td><strong>V</strong> · Behavioural agreement</td><td>Share of property-test cases where all N implementations agree</td><td>20%</td><td>Low agreement means the spec left room for interpretation.</td></tr>
+    <tr><td><strong>C</strong> · Cost stability</td><td>1 − (coefficient of variation of cost-to-green across agents), clipped to [0,1]</td><td>10%</td><td>Wild cost variance means agents wandered.</td></tr>
+  </table></div>
+  <pre class="out" style="margin-top:16px">SSS = 100 × (0.35·Q + 0.35·P + 0.20·V + 0.10·C)
+
+Bands:  ≥ 85  Sufficient — hand to any agent
+        65–84 Workable — expect one revision cycle
+        40–64 Ambiguous — expect rework and drift
+        < 40  Not a spec</pre>
+  <p class="muted" style="margin-top:16px">Run it yourself with the reference harness: <code>python3 tools/sss/sss.py examples/refund-eligibility.bis.yaml --runner mock</code>. Plug in your own agent with <code>--runner cmd --cmd "..."</code>. Formula and harness are open; hosted scoring in CI is on the roadmap.</p>
+</div></section>
+<section><div class="wrap">
+  <h2>Public showcase</h2>
+  <p class="muted">We publish complete BIS specs for well-known open-source components, the agent runs, and the evidence tables. Three are in progress. Results will appear here with the full harness output.</p>
+  <div class="grid c3">
+    <div class="card"><div class="tag">Showcase 1 · in progress</div><h3>Refund eligibility service</h3><p class="muted">Reference spec in the repo. Harness runs pending.</p><span class="pill">SSS: pending</span></div>
+    <div class="card"><div class="tag">Showcase 2 · planned</div><h3>Rate-limited job scheduler</h3><p class="muted">Concurrency, idempotency, and budget constraints.</p><span class="pill">SSS: pending</span></div>
+    <div class="card"><div class="tag">Showcase 3 · planned</div><h3>Document classification with PII controls</h3><p class="muted">Ingress scrubbing, egress leakage checks, fail-closed.</p><span class="pill">SSS: pending</span></div>
+  </div>
+  <p style="margin-top:32px"><a class="btn primary" href="contact.html" data-book>Get your spec scored</a> <a class="btn" href="tools/spec-builder.html">Draft one first</a></p>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.<br><a href="neutrality.html">Vendor-neutrality charter</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+  <div><a href="docs.html">BIS standard</a> · <a href="sss.html">Spec Sufficiency Score</a> · <a href="glossary.html">Glossary</a> · <a href="tools/spec-builder.html">Spec Builder</a> · <a href="tools/readiness.html">Readiness</a> · <a href="about.html">About</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+</div></footer>
+</body>
+</html>

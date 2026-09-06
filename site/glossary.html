@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glossary — Bison</title>
+<meta name="description" content="Definitions of intent engineering terms: spec sufficiency, enforcement point, fallback loop, deterministic integration, objective function, hard floor, and more.">
+<meta property="og:title" content="Glossary — Bison">
+<meta property="og:description" content="Definitions of intent engineering terms: spec sufficiency, enforcement point, fallback loop, deterministic integration, objective function, hard floor, and more.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/config.js"></script>
+<script src="assets/site.js"></script>
+</head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="index.html"><span class="mark"></span>BISON</a>
+  <nav><ul>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="products.html">Products</a></li>
+    <li><a href="method.html">Method</a></li>
+    <li><a href="sss.html">SSS</a></li>
+    <li><a href="certification.html">Certification</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="tools/spec-builder.html">Tools</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="contact.html" data-book>Book a call</a></li>
+  </ul></nav>
+</div></header>
+<main>
+<div class="wrap hero" style="padding-bottom:24px">
+  <div class="kicker">Glossary</div>
+  <h1>The vocabulary of intent engineering</h1>
+  <p class="lead">Terms we use precisely, so that specs, contracts, and audits mean the same thing to everyone.</p>
+</div>
+<section><div class="wrap" style="max-width:860px">
+  <dl>
+    <dt><strong>Intent engineering</strong></dt><dd class="muted">The discipline of translating business needs into specifications precise enough for autonomous agents to implement without clarifying questions and for verification systems to prove.</dd>
+    <dt><strong>Bison Intent Spec (BIS)</strong></dt><dd class="muted">An open, structured spec format with mandatory sections: outcome, objective function, constraints, edge cases, data contracts, accountability, do-not-build list, acceptance tests, evidence.</dd>
+    <dt><strong>Spec Sufficiency Score (SSS)</strong></dt><dd class="muted">A 0–100 measure of whether a spec can be implemented by independent agents with no questions, first-pass test success, behavioural agreement, and stable cost.</dd>
+    <dt><strong>Spec defect</strong></dt><dd class="muted">Any clarifying question an agent raises during implementation. Logged, attributed to a spec section, and fixed upstream.</dd>
+    <dt><strong>Objective function</strong></dt><dd class="muted">The prioritised list of what the system optimises, each with a metric, a target, and a hard floor.</dd>
+    <dt><strong>Hard floor</strong></dt><dd class="muted">The value of a metric below which the situation is an incident, not a regression.</dd>
+    <dt><strong>Constraint</strong></dt><dd class="muted">A rule that must never be violated, with a named enforcement point and a verification reference.</dd>
+    <dt><strong>Enforcement point</strong></dt><dd class="muted">The specific middleware, router, schema, or transaction boundary that makes violating a constraint impossible or detectable. "The model should never" is a wish until it has one.</dd>
+    <dt><strong>Do-not-build list</strong></dt><dd class="muted">Explicit non-goals so that agents do not over-deliver.</dd>
+    <dt><strong>Topology</strong></dt><dd class="muted">The designed structure of a multi-agent system: roles, protocols, delegation paths, consensus rules, fallback loops, cost envelopes.</dd>
+    <dt><strong>Fallback loop</strong></dt><dd class="muted">A deterministic route taken when an agent halts, drifts, returns malformed output, disagrees, loses its provider, or breaches budget.</dd>
+    <dt><strong>Deterministic integration</strong></dt><dd class="muted">Wiring non-deterministic model decisions into transactional systems with idempotency, sagas, event contracts, replay, and circuit breakers.</dd>
+    <dt><strong>Fence</strong></dt><dd class="muted">Bison's policy-enforcing proxy for LLM traffic, at ingress and egress.</dd>
+    <dt><strong>Model equivalence</strong></dt><dd class="muted">Evidence that a system's properties hold unchanged when the underlying model is swapped.</dd>
+    <dt><strong>Evidence table</strong></dt><dd class="muted">The record of which test verified which property, when, with what result, signed by the accountable role.</dd>
+    <dt><strong>Accountable role</strong></dt><dd class="muted">The named human role that owns the risk of a class of automated decision. A role, never a person's name, so accountability survives reorganisation.</dd>
+    <dt><strong>Attestation</strong></dt><dd class="muted">A formal, repeatable statement that named properties were verified by named tests on a named date. Attests to evidence, not to outcomes.</dd>
+  </dl>
+</div></section>
+<style>dt{margin-top:20px}dd{margin:4px 0 0}</style>
+</main>
+<footer><div class="wrap">
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.<br><a href="neutrality.html">Vendor-neutrality charter</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></div>
+  <div><a href="docs.html">BIS standard</a> · <a href="sss.html">Spec Sufficiency Score</a> · <a href="glossary.html">Glossary</a> · <a href="tools/spec-builder.html">Spec Builder</a> · <a href="tools/readiness.html">Readiness</a> · <a href="about.html">About</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+</div></footer>
+</body>
+</html>

@@ -9,6 +9,7 @@
 <meta property="og:description" content="Score your organisation's readiness for AI-native engineering across intent, topology, verification and accountability.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='0,10 16,0 32,10 32,32 0,32' fill='%23f2b134'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="../assets/style.css">
+<script src="../assets/config.js"></script>
 <script src="../assets/site.js"></script>
 </head>
 <body>
@@ -16,12 +17,13 @@
   <a class="brand" href="../index.html"><span class="mark"></span>BISON</a>
   <nav><ul>
     <li><a href="../services.html">Services</a></li>
+    <li><a href="../products.html">Products</a></li>
     <li><a href="../method.html">Method</a></li>
+    <li><a href="../sss.html">SSS</a></li>
+    <li><a href="../certification.html">Certification</a></li>
     <li><a href="../pricing.html">Pricing</a></li>
-    <li><a href="../tools/spec-builder.html">Spec Builder</a></li>
-    <li><a href="../tools/readiness.html">Readiness</a></li>
-    <li><a href="../about.html">About</a></li>
-    <li><a class="btn primary" style="padding:8px 14px" href="../contact.html">Book a call</a></li>
+    <li><a href="../tools/spec-builder.html">Tools</a></li>
+    <li><a class="btn primary" style="padding:8px 14px" href="../contact.html" data-book>Book a call</a></li>
   </ul></nav>
 </div></header>
 <main>
@@ -78,12 +80,11 @@ function score(){
   window._report='Bison AI-Native Readiness\nScore: '+total+'/100\n'+Object.keys(dims).map(function(d){var a=dims[d];return d+': '+(a.length?Math.round(a.reduce(function(s,x){return s+x},0)/(a.length*3)*100):'-')}).join('\n')+'\n\nTop gaps:\n'+gaps.map(function(g){return '- '+g.x.d+': '+g.x.gap+' ('+g.x.svc+')'}).join('\n');
   bisonTrack('readiness_score',{total:total});
 }
-function copyReport(){if(window._report)navigator.clipboard.writeText(window._report).then(function(){alert('Report copied.')})}
-</script>
-</main>
+function copyReport(){if(!window._report)return;bisonCapture('readiness-report',{score:document.getElementById('total').textContent},function(){navigator.clipboard.writeText(window._report).then(function(){alert('Report copied.')})})}
+</script></main>
 <footer><div class="wrap">
-  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.</div>
-  <div><a href="../docs.html">Spec standard</a> · <a href="../tools/spec-builder.html">Spec Builder</a> · <a href="../tools/readiness.html">Readiness score</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
+  <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.<br><a href="../neutrality.html">Vendor-neutrality charter</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></div>
+  <div><a href="../docs.html">BIS standard</a> · <a href="../sss.html">Spec Sufficiency Score</a> · <a href="../glossary.html">Glossary</a> · <a href="../tools/spec-builder.html">Spec Builder</a> · <a href="../tools/readiness.html">Readiness</a> · <a href="../about.html">About</a> · <a href="mailto:hello@bison.systems">hello@bison.systems</a></div>
 </div></footer>
 </body>
 </html>
