@@ -6,7 +6,7 @@ window.bisonLead=function(payload){
   bisonTrack('lead',{source:payload.source});
   try{ var q=JSON.parse(localStorage.getItem('bison-leads')||'[]'); q.push(Object.assign({ts:Date.now()},payload)); localStorage.setItem('bison-leads',JSON.stringify(q.slice(-20))); }catch(e){}
   if(!ep) return Promise.resolve(false);
-  return fetch(ep,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)}).then(function(r){return r.ok}).catch(function(){return false});
+  return fetch(bisonApi(ep),{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)}).then(function(r){return r.ok}).catch(function(){return false});
 };
 // Optional, non-blocking email capture used by the tools. cb() always runs.
 window.bisonCapture=function(source,context,cb){

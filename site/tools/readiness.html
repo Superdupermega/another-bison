@@ -42,6 +42,7 @@
     <div class="muted" id="band">Answer the questions to see your score.</div>
     <div class="bar" style="margin-top:12px"><i id="barfill" style="width:0"></i></div>
     <div id="dims" style="margin-top:20px"></div>
+    <div id="bench" class="help" style="margin-top:14px"></div>
   </div>
   <div class="card" style="margin-top:16px"><div class="tag">Top gaps</div><ul id="gaps" class="muted" style="padding-left:18px"></ul>
     <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="button" onclick="copyReport()">Copy report</button><a class="btn primary" href="../contact.html">Discuss your gaps →</a></div></div>
@@ -79,7 +80,18 @@ function score(){
   document.getElementById('gaps').innerHTML=gaps.length?gaps.map(function(g){return '<li><strong style="color:var(--fg)">'+g.x.d+':</strong> '+g.x.gap+' <span class="pill">'+g.x.svc+'</span></li>'}).join(''):'<li>No critical gaps in the answered questions.</li>';
   window._report='Bison AI-Native Readiness\nScore: '+total+'/100\n'+Object.keys(dims).map(function(d){var a=dims[d];return d+': '+(a.length?Math.round(a.reduce(function(s,x){return s+x},0)/(a.length*3)*100):'-')}).join('\n')+'\n\nTop gaps:\n'+gaps.map(function(g){return '- '+g.x.d+': '+g.x.gap+' ('+g.x.svc+')'}).join('\n');
   bisonTrack('readiness_score',{total:total});
+  if(answered===Q.length&&!window._submitted){window._submitted=true;
+    fetch(bisonApi('/api/readiness'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({total:total,dims:Object.keys(dims).reduce(function(o,d){var a=dims[d];o[d]=Math.round(a.reduce(function(s,x){return s+x},0)/(a.length*3)*100);return o},{}),answers:ans})})
+      .then(function(){loadBench()}).catch(function(){});
+  }
 }
+function loadBench(){
+  fetch(bisonApi('/api/readiness')).then(function(r){return r.json()}).then(function(j){
+    if(!j.ok||!j.n)return;
+    document.getElementById('bench').innerHTML='Benchmark: average <strong>'+j.avg_total+'</strong> across '+j.n+' anonymous submission'+(j.n===1?'':'s')+' (Intent '+j.dims.Intent+', Topology '+j.dims.Topology+', Verification '+j.dims.Verification+', Accountability '+j.dims.Accountability+').';
+  }).catch(function(){});
+}
+loadBench();
 function copyReport(){if(!window._report)return;bisonCapture('readiness-report',{score:document.getElementById('total').textContent},function(){navigator.clipboard.writeText(window._report).then(function(){alert('Report copied.')})})}
 </script></main>
 <footer><div class="wrap">

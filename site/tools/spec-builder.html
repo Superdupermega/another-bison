@@ -75,6 +75,8 @@ Fraud scoring; consume existing fraud service"></textarea>
     <button class="btn" type="button" onclick="loadExample()">Load example</button>
     <button class="btn" type="button" onclick="copySpec()">Copy YAML</button>
     <button class="btn" type="button" onclick="downloadSpec()">Download .bis.yaml</button>
+    <button class="btn" type="button" onclick="serverScore()">Score (SSS)</button>
+    <button class="btn" type="button" onclick="shareSpec()">Share link</button>
     <a class="btn primary" id="reviewLink" href="../contact.html">Have Bison review this →</a>
   </div>
 </form>
@@ -83,6 +85,7 @@ Fraud scoring; consume existing fraud service"></textarea>
     <div class="tag">BIS-lint</div>
     <ul class="lint" id="lint"></ul>
   </div>
+  <div id="serverPanel" class="card" style="margin-top:16px" hidden><div class="tag">Server</div><div id="serverMsg" class="muted"></div></div>
   <pre class="out" id="out" style="margin-top:16px"># fill in the form to generate your spec</pre>
 </div>
 </div>
@@ -148,6 +151,39 @@ function lint(s){
 function renderSpec(){var s=buildSpec();document.getElementById('out').textContent=s.yaml;document.getElementById('lint').innerHTML=lint(s);
   try{localStorage.setItem('bis-draft',JSON.stringify(['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'].map(function(i){return document.getElementById(i).value})))}catch(e){}
   bisonTrack('spec_edit');}
+var FIELDS=['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'];
+function formState(){var o={};FIELDS.forEach(function(k){o[k]=document.getElementById(k).value});return o}
+function serverMsg(html){var p=document.getElementById('serverPanel');p.hidden=false;document.getElementById('serverMsg').innerHTML=html}
+function serverScore(){
+  serverMsg('Scoring on the reference harness…');
+  fetch(bisonApi('/api/spec'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({yaml:document.getElementById('out').textContent,op:'sss'})})
+   .then(function(r){return r.json()}).then(function(j){
+     if(!j.ok){serverMsg('Could not score: '+(j.reason||'error'));return}
+     window._sss=j.sss.sss;
+     serverMsg('<strong style="color:var(--fg);font-size:1.4rem">SSS '+j.sss.sss+'</strong> · '+j.sss.band+' <span class="muted">(Q='+j.sss.Q+' P='+j.sss.P+' V='+j.sss.V+' C='+j.sss.C+', mock runner, 3 runs)</span>'+(j.sss.questions.length?'<ul style="margin:8px 0 0;padding-left:18px">'+j.sss.questions.map(function(q){return '<li>Spec defect: '+q+'</li>'}).join('')+'</ul>':'<div style="margin-top:6px">No spec defects raised.</div>'));
+     bisonTrack('sss_scored',{sss:j.sss.sss});
+   }).catch(function(){serverMsg('Scoring service unavailable. Run <code>python3 tools/sss/sss.py</code> locally.')});
+}
+function shareSpec(){
+  bisonCapture('spec-builder-share',{title:v('title')},function(){
+    var lintText=Array.prototype.map.call(document.querySelectorAll('#lint li'),function(li){return li.textContent});
+    fetch(bisonApi('/api/specs'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:v('title'),yaml:document.getElementById('out').textContent,lint:lintText,sss:window._sss,form:formState()})})
+     .then(function(r){return r.json()}).then(function(j){
+       if(!j.ok){serverMsg('Could not save: '+(j.reason||'error')+'. Use Download instead.');return}
+       var url=location.origin+location.pathname+'?id='+j.id; history.replaceState(null,'','?id='+j.id);
+       serverMsg('Shareable link: <a href="'+url+'">'+url+'</a> <button class="btn" style="padding:4px 10px;margin-left:8px" onclick="navigator.clipboard.writeText(\''+url+'\')">Copy</button>');
+       bisonTrack('spec_shared',{id:j.id});
+     }).catch(function(){serverMsg('Sharing service unavailable. Use Download instead.')});
+  });
+}
+function loadShared(id){
+  fetch(bisonApi('/api/specs?id='+encodeURIComponent(id))).then(function(r){return r.json()}).then(function(j){
+    if(!j.ok||!j.spec)return; var fm=j.spec.form||(j.spec.lint&&j.spec.lint.form);
+    if(fm&&typeof fm==='object'){FIELDS.forEach(function(k){if(fm[k]!=null)document.getElementById(k).value=fm[k]});renderSpec();}
+    else{document.getElementById('out').textContent=j.spec.yaml;}
+    serverMsg('Loaded shared spec <strong>'+(j.spec.title||j.spec.id)+'</strong>'+(j.spec.sss?' · SSS '+j.spec.sss:''));
+  }).catch(function(){});
+}
 function copySpec(){bisonCapture('spec-builder-copy',{title:v('title')},function(){navigator.clipboard.writeText(document.getElementById('out').textContent).then(function(){alert('Copied.')})})}
 function downloadSpec(){bisonCapture('spec-builder-download',{title:v('title')},function(){var b=new Blob([document.getElementById('out').textContent],{type:'text/yaml'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(v('title')||'intent').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.bis.yaml';a.click();bisonTrack('spec_download')})}
 function loadExample(){
@@ -161,7 +197,7 @@ function loadExample(){
   reg:'PSD2 Art. 73 | C2, E4\nInternal Refund Policy v7 | C1, C3'};
   Object.keys(ex).forEach(function(k){document.getElementById(k).value=ex[k]});renderSpec();
 }
-(function(){try{var d=JSON.parse(localStorage.getItem('bis-draft'));if(d){['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'].forEach(function(id,i){document.getElementById(id).value=d[i]||''})}}catch(e){}renderSpec();})();
+(function(){var id=new URLSearchParams(location.search).get('id');if(id&&/^[a-z0-9]{10,16}$/.test(id)){loadShared(id);}try{var d=JSON.parse(localStorage.getItem('bis-draft'));if(d){['title','owner','dclass','risk','outcome','objectives','constraints','edges','inputs','nonGoals','reg'].forEach(function(id,i){document.getElementById(id).value=d[i]||''})}}catch(e){}renderSpec();})();
 </script></main>
 <footer><div class="wrap">
   <div><strong style="color:var(--fg)">Bison</strong> · Intent engineering for AI-native software<br>© 2026 Bison Systems. All rights reserved.<br><a href="../neutrality.html">Vendor-neutrality charter</a> · <a href="../privacy.html">Privacy</a> · <a href="../terms.html">Terms</a></div>

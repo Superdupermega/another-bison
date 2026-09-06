@@ -61,11 +61,16 @@ function bisonSubmit(e){
   var f=e.target, s=document.getElementById('formStatus');
   var data=Object.fromEntries(new FormData(f).entries());
   bisonTrack('contact_submit',{interest:data.interest});
+  function mailto(){
+    var body='Name: '+data.name+'\nEmail: '+data.email+'\nCompany: '+data.company+'\nInterest: '+data.interest+'\n\n'+data.message;
+    location.href='mailto:hello@bison.systems?subject='+encodeURIComponent('Intent review request — '+data.company)+'&body='+encodeURIComponent(body);
+    s.textContent='Opening your email client. If nothing happens, email hello@bison.systems.';
+  }
   if(BISON_FORM_ENDPOINT){
     s.textContent='Sending…';
-    fetch(BISON_FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
-      .then(function(r){ s.textContent = r.ok ? 'Thanks. We will reply within one business day.' : 'Something went wrong. Email hello@bison.systems instead.'; if(r.ok) f.reset(); })
-      .catch(function(){ s.textContent='Network error. Email hello@bison.systems instead.'; });
+    fetch(bisonApi(BISON_FORM_ENDPOINT),{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data)})
+      .then(function(r){ if(r.ok){ s.textContent='Thanks. We will reply within one business day.'; f.reset(); } else { mailto(); } })
+      .catch(function(){ mailto(); });
   } else {
     var body='Name: '+data.name+'\nEmail: '+data.email+'\nCompany: '+data.company+'\nInterest: '+data.interest+'\n\n'+data.message;
     location.href='mailto:hello@bison.systems?subject='+encodeURIComponent('Intent review request — '+data.company)+'&body='+encodeURIComponent(body);
