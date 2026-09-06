@@ -1,0 +1,14 @@
+id: citation_required
+description: Factual claims in output must cite a retrieved source id; uncited claims are routed to a human or dropped.
+stage: egress
+action: route_human
+severity: medium
+detector:
+  type: citation
+  threshold: 1.0
+telemetry: {metric: fence.citation.uncited_claims, hard_floor: "≤1% of factual responses / 7d"}
+test:
+  should_match:
+    - "The customer's order was delivered on 3 March."
+  should_not_match:
+    - "The customer's order was delivered on 3 March [src:orders-db#20260303-77]."

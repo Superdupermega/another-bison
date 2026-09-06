@@ -1,0 +1,20 @@
+id: pii_egress
+description: Block or redact personal identifiers and payment instruments in model output before it reaches a user or state.
+stage: egress
+action: redact
+severity: critical
+detector:
+  type: regex
+  patterns:
+    - '\b(?:\d[ -]*?){13,16}\b'                      # card numbers (Luhn check applied by runtime)
+    - '\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b'             # IBAN
+    - '\b\d{3}-\d{2}-\d{4}\b'                        # US SSN
+    - '\b[\w.+-]+@[\w-]+\.[\w.]+\b'                  # email
+telemetry: {metric: fence.pii_egress.redactions, hard_floor: "0 unredacted escapes / 30d"}
+test:
+  should_match:
+    - "Your card 4111 1111 1111 1111 has been refunded"
+    - "Contact jane.doe@example.com for the invoice"
+  should_not_match:
+    - "Your refund of $42.10 has been approved"
+    - "Order 20260906-1234 is eligible"

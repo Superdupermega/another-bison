@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fence policy",
+  "type": "object",
+  "required": ["id", "stage", "action", "detector", "severity", "test"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "description": {"type": "string"},
+    "stage": {"enum": ["ingress", "egress", "both"]},
+    "action": {"enum": ["block", "redact", "repair_once_then_block", "route_human", "degrade"]},
+    "severity": {"enum": ["low", "medium", "high", "critical"]},
+    "detector": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {"enum": ["regex", "classifier", "schema", "budget", "allowlist", "citation"]},
+        "patterns": {"type": "array", "items": {"type": "string"}},
+        "model": {"type": "string"},
+        "threshold": {"type": "number"},
+        "schema_ref": {"type": "string"},
+        "limit": {"type": "number"},
+        "window": {"type": "string"},
+        "allowed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "telemetry": {"type": "object", "properties": {"metric": {"type": "string"}, "hard_floor": {"type": "string"}}},
+    "test": {
+      "type": "object",
+      "required": ["should_match", "should_not_match"],
+      "properties": {"should_match": {"type": "array", "items": {"type": "string"}}, "should_not_match": {"type": "array", "items": {"type": "string"}}}
+    }
+  }
+}

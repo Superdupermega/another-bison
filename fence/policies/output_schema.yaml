@@ -1,0 +1,15 @@
+id: output_schema
+description: Model output must conform to the declared JSON schema; one structured repair attempt, then fail closed with a typed error.
+stage: egress
+action: repair_once_then_block
+severity: high
+detector:
+  type: schema
+  schema_ref: schemas/decision.v1.json
+telemetry: {metric: fence.output_schema.failures, hard_floor: "≤0.5% of responses / 24h"}
+test:
+  should_match:
+    - '{"decision": "maybe"}'
+    - 'Sure! Here is the decision: approved'
+  should_not_match:
+    - '{"decision": "approve", "reason": "eligible", "confidence": 0.93}'

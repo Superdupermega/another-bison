@@ -130,12 +130,41 @@ Risk tolerance definitions, ethical boundary policy, sign-off matrix (who is
 accountable for what class of automated decision), regulatory mapping. Designed for
 the board and the regulator, implemented in the codebase.
 
-### 4.5 Products (Year 2)
+**Model Migration Verification** — 1–2 weeks · $25,000–$60,000 per migration
+Every model deprecation forces a swap with no proof behaviour is preserved. We run
+the client's property tests, probes and golden decisions against the new model,
+report drift by property, and gate the cut-over. Recurring and involuntary: the
+deadline is set by the vendor, not by us. Included in the Guardrail Retainer.
 
-- **BIS (Bison Intent Spec)** — open standard + open-source validator + hosted
-  "spec linter" ($49–$199/seat/month for teams). Lead-gen and the wedge.
-- **Fence** — the guardrail proxy, packaged as a self-hosted product with a
-  managed policy library. $2,500–$15,000/month by traffic tier.
+**Bison Attested** — 3–4 weeks + annual renewal · $45,000–$90,000 / year
+A signed, repeatable attestation that a named system's safety properties hold,
+backed by the evidence table, probes and telemetry, mapped to EU AI Act Annex IV,
+ISO/IEC 42001 and NIST AI RMF. Attests to evidence, not outcomes. Renewed on
+material change and on every model migration.
+
+**Intent Portfolio Review** — 2 days · $12,000
+Senior-only: the CTO's backlog ranked by spec-readiness and cost of ambiguity.
+Opens every door in the organisation and queues Intent Sprints.
+
+**Intent Engineer Certification** — 4 weeks part-time · $4,500 per seat
+Cohort programme built from our playbooks; exam scored by Spec Sufficiency Score.
+Enterprise licence for platform teams.
+
+### 4.5 Products
+
+Detail in `06-what-we-missed-and-moats.md` §4. Status as of this version:
+
+| Product | Status | Pricing shape |
+|---|---|---|
+| BIS standard, `bis-lint`, GitHub Action, pre-commit hook | Shipped, open source | Free; hosted CI scoring $49–$199/seat/month (Q2) |
+| Spec Sufficiency Score formula + reference harness | Shipped, open | Free; hosted scoring bundled with CI tier |
+| Intent-engineer agent skill | Shipped, open | Free (distribution) |
+| `bis-testgen` spec-to-test generator | Beta | CI tier add-on |
+| Fence policy registry (schema + core policies) | Shipped, open | Free core; vertical packs $2,500–$15,000/month; self-hosted proxy 2027 |
+| Model Equivalence Suite (inside Fence) | Q2 | Per migration or in retainer |
+| Bison Attested | Pilot Q4, GA 2027 | Fixed fee + annual renewal |
+
+Year-two revenue mix target: 55% services / 45% products and certification.
 
 ## 5. Delivery model
 
@@ -185,6 +214,22 @@ Sensitivities: the model breaks if average deal size stays below $35k or close r
 from qualified pipeline falls below 25%. Both are mitigated by the fixed-price
 Intent Sprint as a low-risk entry product that upsells into Topology and Fence.
 
+## 7a. The five separation bets
+
+The plan above is a consultancy. What makes it defensible is set out in
+`06-what-we-missed-and-moats.md` and summarised here because it changes sequencing:
+
+1. **Own the metric**: Spec Sufficiency Score, public formula and harness.
+2. **Own the role**: Intent Engineer certification and registry.
+3. **Own the signature**: Bison Attested, evidence-based, regulation-mapped.
+4. **Own the calendar**: Model Migration Verification on every deprecation.
+5. **Distribute where engineers work**: agent skill, CI lint, test generation,
+   Fence policy registry.
+
+All five feed one data flywheel (spec-defect corpus, failure-mode taxonomy,
+vertical rule registers, model drift ledger). That corpus is the moat; the method
+is only the head start.
+
 ## 8. Go-to-market summary
 
 (Full detail in `03-go-to-market.md`.)
@@ -201,6 +246,9 @@ Intent Sprint as a low-risk entry product that upsells into Topology and Fence.
    "make it safe and specific" partner.
 
 ## 9. First 90 days
+
+Superseded by the resequenced plan in `06-what-we-missed-and-moats.md` §6. The
+original is kept for reference.
 
 | Week | Milestone |
 |---|---|

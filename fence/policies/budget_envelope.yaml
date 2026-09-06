@@ -1,0 +1,15 @@
+id: budget_envelope
+description: Per-decision and per-tenant spend and latency envelopes; breach is a hard stop and an incident, never a silent continue.
+stage: both
+action: degrade
+severity: high
+detector:
+  type: budget
+  limit: 0.01
+  window: per_decision_usd
+telemetry: {metric: fence.budget.breaches, hard_floor: "0 silent overruns"}
+test:
+  should_match:
+    - "cost_usd=0.014 tokens=61000"
+  should_not_match:
+    - "cost_usd=0.003 tokens=9000"

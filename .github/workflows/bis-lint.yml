@@ -1,0 +1,21 @@
+name: BIS lint and Spec Sufficiency
+on:
+  push:
+    paths: ["**/*.bis.yaml", "tools/**", ".github/workflows/bis-lint.yml"]
+  pull_request:
+    paths: ["**/*.bis.yaml", "tools/**"]
+jobs:
+  bis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install pyyaml
+      - name: bis-lint
+        run: python3 tools/bis-lint.py $(git ls-files '*.bis.yaml')
+      - name: Spec Sufficiency Score (mock runner)
+        run: |
+          for f in $(git ls-files '*.bis.yaml'); do python3 tools/sss/sss.py "$f" --runner mock --min 65; done
+      - name: bis-testgen smoke
+        run: python3 tools/bis-testgen.py examples/refund-eligibility.bis.yaml -o /tmp/test_spec.py && python3 -c "import ast;ast.parse(open('/tmp/test_spec.py').read())"

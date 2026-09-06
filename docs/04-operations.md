@@ -27,6 +27,20 @@
 | CRM and pipeline | Lightweight CRM; weekly metrics sheet | |
 | Finance | Accounting SaaS; invoicing on milestones | |
 
+### 2a. Security and assurance posture
+
+- SOC 2 Type I kickoff in Q1 (cheap now, deal-blocker later); Type II by Q4.
+- ISO 27001 scoping in Q3 if enterprise pipeline warrants it.
+- Insurer conversations from month six on a warranty-backed attestation.
+
+### 2b. Dogfooding telemetry
+
+Every engagement runs through the same pipeline we sell: BIS → lint → SSS → agent
+implementation → testgen → verification → evidence. We record per engagement:
+clarifying questions (spec defects), cost to green, agent hours vs human hours, and
+before/after SSS. Delivery cost per engagement must fall quarter over quarter; that
+is the margin moat and it is reviewed monthly.
+
 ## 3. Hiring plan
 
 | Hire | When | Profile |

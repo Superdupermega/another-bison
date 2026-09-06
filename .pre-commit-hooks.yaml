@@ -1,0 +1,7 @@
+- id: bis-lint
+  name: bis-lint
+  description: Validate Bison Intent Spec files against BIS v0.1
+  entry: python3 tools/bis-lint.py
+  language: python
+  additional_dependencies: [pyyaml]
+  files: \.bis\.yaml$

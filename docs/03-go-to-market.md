@@ -46,6 +46,24 @@ hourly staff augmentation.
 | Speaking | Engineering leadership conferences, CTO communities, regulator-adjacent forums | 1 talk/quarter |
 | Referrals | Every engagement ends with a reference request and a 10% referral credit on the next Sprint | 30% of pipeline from referrals by month 12 |
 
+## 4a. Category-ownership motions (from the strategy addendum)
+
+- **Procurement pull for BIS.** Target one large buyer per vertical (bank, health
+  system, government department) to require BIS specs plus evidence tables from AI
+  vendors in an RFP. One clause outperforms a year of content.
+- **Public showcase specs.** Three complete BIS specs for well-known open-source
+  components with agent runs and evidence tables, published with harness output on
+  the SSS page. This is the proof of the thesis.
+- **Public migration drift reports.** On every major model release, publish an
+  unsponsored equivalence report across common tasks. Shared widely; nobody else is
+  neutral enough to publish it.
+- **Vendor-neutrality charter** on the site, linked from every proposal.
+- **Distribution inside tools.** The intent-engineer agent skill, `bis-lint` in CI,
+  and the Fence policy registry are free; each one ends in a Bison touchpoint
+  (SSS scoring, spec-defect digest, vertical packs).
+- **Spec-defect digest.** Fortnightly email built from the anonymised corpus; the
+  opt-in is offered inside both site tools at the moment of value.
+
 ## 5. Sales process
 
 1. **Intent review (free, 45 min)**: client brings one thing built wrong or one
